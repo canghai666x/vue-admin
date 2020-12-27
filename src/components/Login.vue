@@ -7,12 +7,12 @@
         <img src="../assets/logo.png" alt="">
       </div>
       <!--      输入表单-->
-      <el-form ref="loginFormRef" :model="LoginForm" :rules="loginRules" label-width="0px" class="login_form">
+      <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules" label-width="0px" class="login_form">
         <el-form-item prop="username">
-          <el-input v-model="LoginForm.username" prefix-icon="el-icon-user"></el-input>
+          <el-input v-model="loginForm.username" prefix-icon="el-icon-user"></el-input>
         </el-form-item>
         <el-form-item prop="password">
-          <el-input v-model="LoginForm.password" prefix-icon="el-icon-lock" type="password"></el-input>
+          <el-input v-model="loginForm.password" prefix-icon="el-icon-lock" type="password"></el-input>
         </el-form-item>
         <el-form-item class="btns">
           <el-button type="primary" @click="login">登陆</el-button>
@@ -28,9 +28,9 @@ export default {
   data() {
     return {
       //数据绑定表单对象
-      LoginForm: {
-        username: '',
-        password: '',
+      loginForm: {
+        username: 'admin',
+        password: '123456',
       },
       //表单验证规则
       loginRules: {
@@ -45,15 +45,28 @@ export default {
       }
     }
   },
-  methods:{
-    resetLoginForm(){
+  methods: {
+    resetLoginForm() {
       this.$refs.loginFormRef.resetFields();
     },
-    login(){
-      this.$refs.loginFormRef.validate(valid=>{
-        if(!valid) return;
-          console.log("登陆成功")
-        this.$message.success("登陆成功")
+    login() {
+      this.$refs.loginFormRef.validate(async valid => {
+        if (!valid) return;
+        const {data: res} = await this.$http.post("login", this.loginForm);
+        if(res.meta.status != 200){
+          this.$message({
+            duration: "1000",
+            type: "error",
+            message: "登陆失败"
+          })
+          return;
+        }
+        this.$message({
+          duration: "1000",
+          type: "success",
+          message: "登陆成功"
+        })
+        window.sessionStorage.setItem("token",res.data.token);
         this.$router.push("/home")
       });
     }

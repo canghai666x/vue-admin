@@ -8,9 +8,12 @@ import axios from 'axios'
 
 
 Vue.prototype.$http=axios
-axios.defaults.baseURL=''
+axios.defaults.baseURL='http://timemeetyou.com:8889/api/private/v1/'
 Vue.config.productionTip = false
-
+axios.interceptors.request.use(config=>{
+  config.headers.authorization = window.sessionStorage.getItem("token");
+  return config;
+})
 
 new Vue({
   router,
